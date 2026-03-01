@@ -1,0 +1,28 @@
+* {
+    margin: 0;        /* ✅ no gaps */
+    padding: 0;       /* ✅ no gaps */
+    overflow: hidden; /* ✅ no scrollbars */
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;              /* ✅ needed for centering */
+    align-items: center;        /* ✅ center vertically */
+    justify-content: center;    /* ✅ center horizontally */
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(to bottom,
+    #231544,   /* black */
+    #06061c,   /* dark blue */
+    #130427);  /* dark purple */
+
+}
+
+canvas {
+    background-color: rgb(7, 7, 27);
+    display: block;
+    width: 90vw;    /* ✅ 90% of screen width */
+    height: 90vh;   /* ✅ 90% of screen height */
+}
+
+
