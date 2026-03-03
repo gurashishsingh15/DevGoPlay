@@ -19,7 +19,7 @@ body {
 }
 
 canvas {
-    background-color: rgb(7, 7, 27);
+    background-color: rgb(0, 0, 0);
     display: block;
     width: 90vw;    /* ✅ 90% of screen width */
     height: 90vh;   /* ✅ 90% of screen height */

@@ -1,0 +1,102 @@
+const canvas = document.getElementById("canvas");//this is used to connect with canvas from html
+const brush = canvas.getContext("2d");//the brush is created 
+
+// Setup Canvas Size
+const resize = () => {
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+};
+window.addEventListener('resize', resize);
+resize();
+
+// Animation Constants
+let time = 0;
+const frequency = 0.005; 
+const speed = 0.05;
+const amplitude = 150; // Fixed amplitude for stability, or use Math.random()*200
+
+// Interactive Jitter (Rocket Ball Control)
+let jitter = 0;
+const JITTER_SPEED = 8;
+const JITTER_LIMIT = 250;
+const keys = {};
+
+// Input Listeners
+window.addEventListener("keydown", (e) => keys[e.code] = true);
+window.addEventListener("keyup", (e) => keys[e.code] = false);
+
+const drawMoon = (x, y) => {
+    brush.save(); 
+    brush.beginPath();
+    brush.arc(x, y, 150, 0, Math.PI * 2);
+    brush.fillStyle = "black";
+    brush.shadowColor = "#FFD700";
+    brush.shadowBlur = 50;
+    brush.fill();
+
+    // Subtle golden rim
+    brush.strokeStyle = "#FFD700";
+    brush.lineWidth = 3;
+    brush.stroke();
+    brush.restore(); 
+};
+
+const drawRocketBall = (x, y) => {
+    brush.beginPath();
+    brush.arc(x, y, 12, 0, Math.PI * 2);
+    brush.fillStyle = "white";
+    brush.shadowColor = "white";
+    brush.shadowBlur = 15;
+    brush.fill();
+};
+
+const animate = () => {
+    // 1. Clear Screen
+    brush.fillStyle = "#050505"; // Dark space background
+    brush.fillRect(0, 0, canvas.width, canvas.height);
+
+    const centerY = canvas.height / 2;
+
+    // 2. Handle Controls
+    if (keys["ArrowUp"]) jitter -= JITTER_SPEED;
+    if (keys["ArrowDown"]) jitter += JITTER_SPEED;
+    jitter = Math.max(-JITTER_LIMIT, Math.min(JITTER_LIMIT, jitter));
+
+    // 3. Draw Moon (Positioned at the right edge)
+    drawMoon(canvas.width - 100, centerY);
+
+    // 4. Draw Wave & Particles (Combined Loop)
+    brush.beginPath();
+    brush.strokeStyle = "#FFD700";
+    brush.lineWidth = 2;
+    brush.shadowBlur = 10;
+    brush.shadowColor = "#FFD700";
+
+    for (let x = 0; x <= canvas.width; x += 5) {
+        const y = centerY + Math.sin(x * frequency - time) * amplitude;
+        
+        if (x === 0) brush.moveTo(x, y);
+        else brush.lineTo(x, y);
+
+        // Add "spark" particles every few pixels
+        if (x % 10 === 0) {
+            brush.fillStyle = "#FFD700";
+            brush.fillRect(x - 1, y - 1, 3, 3);
+        }
+    }
+    brush.stroke();
+
+    // 5. Draw Rocket Ball
+    const ballX = canvas.width / 4;
+    // Follows wave math + manual jitter
+    const waveYAtBall = centerY + Math.sin(ballX * frequency - time) * amplitude;
+    const ballY = waveYAtBall + jitter;
+    
+    drawRocketBall(ballX, ballY);
+
+    // 6. Update State
+    time -= speed; 
+    requestAnimationFrame(animate);
+};
+
+animate();
