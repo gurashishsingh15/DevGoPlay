@@ -63,11 +63,7 @@ const wavegenerator = () => {
     brush.beginPath();
     brush.lineWidth = 3;
     brush.shadowBlur = 2;
-    if (Math.floor(time * 1) % 2 === 0) {
-    brush.strokeStyle = "#FFD700";      
-    } else {
-    brush.strokeStyle = "white";
-    }
+    brush.strokeStyle = "#FFD700";
     brush.shadowColor = "#FFD700";
     brush.fillStyle = "#FFD700";
     //break down of wave generationg 
@@ -80,7 +76,7 @@ const wavegenerator = () => {
         else {
             brush.lineTo(x, y);//this draws the line on the trajectory that was mentioned above....
         }
-        brush.fillRect(x, y+20, 2, 2); // draw small rectangle at each point to create a dotted effect
+ 
     }
     brush.stroke();
 

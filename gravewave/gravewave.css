@@ -23,6 +23,7 @@ canvas {
     display: block;
     width: 90vw;    /* ✅ 90% of screen width */
     height: 90vh;   /* ✅ 90% of screen height */
+    
 }
 
 
