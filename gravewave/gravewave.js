@@ -7,11 +7,11 @@ canvas.width = window.innerWidth;
 
 // wave system
 let time = 0;
-const frequency = 0.005;
+const frequency = 0.004;
 const speed = 0.05;
 
 let amplitude = 0;
-const AMPLITUDE_LIMIT = 150;
+const AMPLITUDE_LIMIT = 100;
 
 // rocket control
 let jitter = 100;
@@ -20,6 +20,14 @@ const JITTER_LIMIT = 100;
 // meteor
 let meteorX1 = 0;
 let meteorX2 = 0;
+
+const colliion = (rocketX,rocketY,ballY, ballX) => {
+    let distance = Math.sqrt((rocketX - ballX) ** 2 + (rocketY - ballY) ** 2);
+    if (distance < 10) {
+        alert("Collision Detected!");
+    }
+};
+
 
 // 🌕 Moon
 const drawMoon = (x, y) => {
@@ -61,13 +69,13 @@ const rocketball = (x, y) => {
 // keyboard controls
 window.addEventListener("keyup", (event) => {
     if (event.code === "ArrowUp") {
-        jitter = Math.min(JITTER_LIMIT, jitter + 20);
+        jitter = Math.min(JITTER_LIMIT, jitter + 200);
     }
 });
 
 window.addEventListener("keydown", (event) => {
     if (event.code === "ArrowDown") {
-        jitter = Math.max(-JITTER_LIMIT, jitter - 20);
+        jitter = Math.max(-JITTER_LIMIT, jitter - 200);
     }
 });
 
@@ -109,7 +117,7 @@ const animate = () => {
     meteorball(meteorX2, canvas.height / 2 + 100);
     meteorball(meteorX1, canvas.height / 2 - 100);
 
-    meteorX2 -= 20;
+    meteorX2 -= 10;
     meteorX1 -= 5;
 
     if (meteorX1 < 0) {
@@ -122,22 +130,17 @@ const animate = () => {
 
 
     // 🚀 Rocket ball
-    const ballX = canvas.width / 4;
+    const ballX = canvas.width/4;
 
-    const rawBallY =
-        centerY +
-        Math.sin(ballX * frequency - time) * amplitude +
-        jitter;
+    const rawBallY =centerY +
+    Math.sin(ballX * frequency - time) * amplitude + jitter;
 
-    const ballY = Math.max(10, Math.min(canvas.height - 10, rawBallY));
-
-    rocketball(ballX, ballY);
-
+    rocketball(ballX, rawBallY);
 
     // 🌕 Moon
     drawMoon(canvas.width, canvas.height / 2);
 
-
+    colliion(ballX, rawBallY, canvas.height/2+100, meteorX1);
     // wave motion
     time += speed;
 
