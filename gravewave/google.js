@@ -1,5 +1,6 @@
-const canvas = document.getElementById("gameCanvas");
+/*const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+const video = document.getElementById("video");
 
 // Set canvas size
 canvas.width = window.innerWidth;
@@ -47,10 +48,22 @@ function drawBall() {
   ctx.stroke();
 }
 
-// In your game loop
 function loop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // 1. Draw video as background first
+  if (video.readyState >= 2) {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  } else {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // 2. Draw game elements on top
   updateBall();
   drawBall();
+
   requestAnimationFrame(loop);
 }
+
+// Start loop once video is ready
+video.addEventListener("playing", loop);
+// Also start if video already playing
+if (!video.paused) loop();*/
