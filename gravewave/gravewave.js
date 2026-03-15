@@ -6,6 +6,9 @@ const video = document.getElementById("video");
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 
+//gameover
+let gameover =false ;
+
 // wave system
 let time = 0;
 const frequency = 0.004;
@@ -17,18 +20,24 @@ const AMPLITUDE_LIMIT = 100;
 // rocket control
 let jitter = 100;
 const JITTER_LIMIT = 100;
-
+let goingUp = true;
 // meteor
-let meteorX1 = 0;
-let meteorX2 = 0;
+let meteorX1 = canvas.width;
+let meteorX2 = canvas.width;
+let meteorY1 = canvas.height / 2 - 200 + Math.random() * 200;
+let meteorY2 = canvas.height / 2 + Math.random() * 200;
+
+
+const metor1speed = Math.random() * 20+5;
+const metor2speed = Math.random() * 20+8;
 
 const colliion = (rocketX, rocketY, meteorX, meteorY) => {
     let distance = Math.sqrt((rocketX - meteorX) ** 2 + (rocketY - meteorY) ** 2);
-    if (distance < 40) {
+    if (distance < 50 && gameOver === false) {
+        gameOver = true;
         alert("Collision Detected!");
     }
 };
-
 // 🌕 Moon
 const drawMoon = (x, y) => {
     brush.save();
@@ -46,8 +55,8 @@ const drawMoon = (x, y) => {
 // 🌠 Meteor
 const meteorball = (x, y) => {
     brush.beginPath();
-    brush.arc(x, y, 10, 0, Math.PI * 2);
-    brush.fillStyle = "white";
+    brush.arc(x, y, 40, 0, Math.PI * 2);
+    brush.fillStyle = "grey";
     brush.fill();
 };
 
@@ -61,17 +70,17 @@ const rocketball = (x, y) => {
 
 // keyboard controls
 window.addEventListener("keyup", (event) => {
-    if (event.code === "ArrowUp") {
-        jitter = Math.min(JITTER_LIMIT, jitter + 200);
+    if (event.code === "Space") {
+        goingUp = !goingUp;
+        
+        if (goingUp === true) {
+            jitter = Math.min(JITTER_LIMIT, jitter + 200);
+        }
+        if (goingUp === false) {
+            jitter = Math.max(-JITTER_LIMIT, jitter - 200);
+        }
     }
 });
-
-window.addEventListener("keydown", (event) => {
-    if (event.code === "ArrowDown") {
-        jitter = Math.max(-JITTER_LIMIT, jitter - 200);
-    }
-});
-
 // 🌊 Main Animation Loop
 const animate = () => {
 
@@ -107,14 +116,21 @@ const animate = () => {
     brush.stroke();
 
     // 🌠 Meteor movement
-    meteorball(meteorX2, canvas.height / 2 + 100);
-    meteorball(meteorX1, canvas.height / 2 - 100);
+    meteorball(meteorX2, meteorY2);
+    meteorball(meteorX1, meteorY1);
 
-    meteorX2 -= 10;
-    meteorX1 -= 5;
+    meteorX2 -= metor2speed;
+    meteorX1 -= metor1speed;
 
-    if (meteorX1 < 0) meteorX1 = canvas.width;
-    if (meteorX2 < 0) meteorX2 = canvas.width;
+    if (meteorX1 < 0){
+        meteorX1 = canvas.width
+        meteorY1 = canvas.height / 2 -200 + Math.random() * 200;
+    }
+
+    if (meteorX2 < 0) {
+        meteorX2 = canvas.width
+        meteorY2 = canvas.height / 2 + Math.random() * 200;   
+    }
 
     // 🚀 Rocket ball
     const ballX = canvas.width / 4;
@@ -125,8 +141,8 @@ const animate = () => {
     drawMoon(canvas.width, canvas.height / 2);
 
     // ✅ check both meteors
-    colliion(ballX, rawBallY, meteorX1, canvas.height / 2 - 100);
-    colliion(ballX, rawBallY, meteorX2, canvas.height / 2 + 100);
+    colliion(ballX, rawBallY, meteorX1, meteorY1);
+    colliion(ballX, rawBallY, meteorX2, meteorY2);
 
     time += speed;
     requestAnimationFrame(animate);
