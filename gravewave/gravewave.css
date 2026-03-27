@@ -27,3 +27,8 @@ canvas {
 }
 
 
+p {
+    font-style: oblique;
+    color: white ;
+    font-size: 100px;
+}

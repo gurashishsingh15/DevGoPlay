@@ -52,22 +52,96 @@ const drawMoon = (x, y) => {
     brush.restore();
 };
 
+// 🕳️ Crater Creator - Draws small details onto the meteor
+const creators = (x, y, radius) => {
+    // We draw 3-5 small craters per meteor
+    for (let i = 0; i < 4; i++) {
+        // Offset them slightly from the center so they spread out
+        const cx = x + Math.cos(i) * (radius * 0.4);
+        const cy = y + Math.sin(i) * (radius * 0.4);
+        const csize = radius * 0.15;
+
+        brush.beginPath();
+        brush.arc(cx, cy, csize, 0, Math.PI * 2);
+        brush.fillStyle = "rgba(0, 0, 0, 0.3)"; // Darker transparent grey for depth
+        brush.fill();
+    }
+};
+
 // 🌠 Meteor
 const meteorball = (x, y) => {
-    brush.beginPath();
-    brush.arc(x, y, 40, 0, Math.PI * 2);
+    const radius = 40; 
+    // Use Math.floor to ensure 'segments' is a whole number for the loop
+    const segments = 10; 
+    const steps = (2 * Math.PI) / segments;
+
+    brush.beginPath(); 
+
+    for (let i = 0; i < segments; i++) {
+        const angle = i * steps;
+        
+        // This sin-based offset creates a consistent jagged look
+        const offset = Math.sin(i * 1.5) * (radius * 0.3);
+        const r = radius + offset;
+
+        const mX = x + Math.cos(angle) * r;
+        const mY = y + Math.sin(angle) * r;
+
+        if (i === 0) {
+            brush.moveTo(mX, mY);
+        } else {
+            brush.lineTo(mX, mY);
+        }
+    }
+
+    brush.closePath(); 
     brush.fillStyle = "grey";
     brush.fill();
-};
+    creators(x, y, radius);
 
+    brush.strokeStyle = "white";
+    brush.lineWidth = 1;
+    brush.stroke();
+};
 // 🚀 Rocket Ball
 const rocketball = (x, y) => {
+    const base = 20;   
+    const height = 30; 
+
+    // --- 1. THE MAIN BODY (White Rectangle) ---
     brush.beginPath();
-    brush.arc(x, y, 10, 0, Math.PI * 2);
+    // Start at top-back of the nose cone and draw left
+    brush.moveTo(x - height/2, y - base/2);
+    brush.lineTo(x - height - 10, y - base/2);
+    brush.lineTo(x - height - 10, y + base/2);
+    brush.lineTo(x - height/2, y + base/2);
+    brush.closePath();
+    
     brush.fillStyle = "white";
     brush.fill();
-};
+    brush.strokeStyle = "#000000";
+    brush.lineWidth = 1;
+    brush.stroke();
 
+    // --- 2. THE NOSE CONE (Red Triangle) ---
+    brush.beginPath();
+    brush.moveTo(x - height/2, y - base/2); // Back-Top
+    brush.lineTo(x + height/2, y);          // Front-Tip
+    brush.lineTo(x - height/2, y + base/2); // Back-Bottom
+    brush.closePath();
+    
+    brush.fillStyle = "red";
+    brush.fill();
+    brush.strokeStyle = "#000000";
+    brush.stroke();
+
+    // --- 3. THE THRUSTER (Optional "Vibe") ---
+    // Let's add a small flame since we have a back-end now!
+    brush.beginPath();
+    brush.arc(x - height - 12, y, 5, 0, Math.PI * 2);
+    brush.fillStyle = "orange";
+    brush.fill();
+};
 // keyboard controls
 window.addEventListener("keyup", (event) => {
     if (event.code === "Space") {
