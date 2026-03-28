@@ -26,12 +26,20 @@ let meteorX2 = canvas.width;
 let meteorY1 = canvas.height / 2 - 200 + Math.random() * 200;
 let meteorY2 = canvas.height / 2 + Math.random() * 200;
 
-
-const metor1speed = Math.random() * 20+5;
-const metor2speed = Math.random() * 20+8;
+let metorspeed = 5; // Start with a base speed so they move immediately
+const MAX_METEOR_SPEED = 25;
 
 //gameover
 let gameover =false ;
+
+
+function scoreboard() {
+    brush.font = "20px Arial";
+    brush.fillStyle = "white";
+    brush.textAlign = "left";
+    brush.fillText(`score: ${Math.floor(time)}`, 20, 30);
+}   
+
 function gameoverdis(gameover) {
     if (gameover === true) {
         // 1. Semi-transparent black overlay
@@ -50,6 +58,11 @@ function gameoverdis(gameover) {
         brush.fillStyle = "white";
         // Shifted down slightly to avoid overlapping the main title
         brush.fillText("Press F5 to Restart the Mission", canvas.width / 2, canvas.height / 2 + 60);
+
+        // Inside gameoverdis()
+        brush.fillStyle = "yellow";
+        brush.font = "30px Arial";
+        brush.fillText(`FINAL SCORE: ${Math.floor(time)}`, canvas.width / 2, canvas.height / 2 + 110);// Inside gameoverdis()
         gameover = false; // Reset gameover to prevent repeated calls
     }
 }
@@ -93,6 +106,15 @@ const creators = (x, y, radius) => {
         brush.fill();
     }
 };
+
+function scoreboard() {
+    brush.font = "20px Arial";
+    brush.fillStyle = "white";
+    brush.textAlign = "left";
+    brush.fillText(`score: ${Math.floor(time)}`, 20, 30);
+}   
+
+
 
 // 🌠 Meteor
 const meteorball = (x, y) => {
@@ -183,11 +205,17 @@ window.addEventListener("keyup", (event) => {
 });
 // 🌊 Main Animation Loop
 const animate = () => {
-    brush.clearRect(0, 0, canvas.width, canvas.height);
+    
     if (gameover === true) {
         gameoverdis(gameover);
         return; 
     }
+    brush.clearRect(0, 0, canvas.width, canvas.height);
+    //meteor speed increase
+   if (metorspeed < MAX_METEOR_SPEED) {
+        metorspeed += 0.005; // Gradually gets harder
+    }
+
     // grow wave amplitude
     if (amplitude <= AMPLITUDE_LIMIT) {
         amplitude += 0.2;
@@ -212,21 +240,20 @@ const animate = () => {
     }
     brush.stroke();
 
-    // 🌠 Meteor movement
-    meteorball(meteorX2, meteorY2);
+  // 4. Meteor Logic
     meteorball(meteorX1, meteorY1);
+    meteorball(meteorX2, meteorY2);
 
-    meteorX2 -= metor2speed;
-    meteorX1 -= metor1speed;
+    meteorX1 -= metorspeed;
+    meteorX2 -= metorspeed + 2; // Make one slightly faster for variety
 
-    if (meteorX1 < 0){
-        meteorX1 = canvas.width
-        meteorY1 = canvas.height / 2 -200 + Math.random() * 200;
+    if (meteorX1 < -50) {
+        meteorX1 = canvas.width;
+        meteorY1 = centerY - 200 + Math.random() * 400;
     }
-
-    if (meteorX2 < 0) {
-        meteorX2 = canvas.width
-        meteorY2 = canvas.height / 2 + Math.random() * 200;   
+    if (meteorX2 < -50) {
+        meteorX2 = canvas.width;
+        meteorY2 = centerY - 200 + Math.random() * 400;
     }
 
     // 🚀 Rocket ball
@@ -241,6 +268,7 @@ const animate = () => {
     colliion(ballX, rawBallY, meteorX1, meteorY1);
     colliion(ballX, rawBallY, meteorX2, meteorY2);
 
+    scoreboard()
     
 
     time += speed;
