@@ -6,8 +6,7 @@ const video = document.getElementById("video");
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 
-//gameover
-let gameover =false ;
+
 
 // wave system
 let time = 0;
@@ -31,12 +30,39 @@ let meteorY2 = canvas.height / 2 + Math.random() * 200;
 const metor1speed = Math.random() * 20+5;
 const metor2speed = Math.random() * 20+8;
 
+//gameover
+let gameover =false ;
+function gameoverdis(gameover) {
+    if (gameover === true) {
+        // 1. Semi-transparent black overlay
+        brush.fillStyle = "rgba(0, 0, 0, 0.8)"; 
+        brush.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 2. Main "Mission Failed" Text
+        brush.font = "bold 60px 'Courier New'"; // Added bold for more impact
+        brush.fillStyle = "red";
+        brush.textAlign = "center";
+        brush.textBaseline = "middle"; // Ensures perfect vertical centering
+        brush.fillText("MISSION FAILED", canvas.width / 2, canvas.height / 2);
+
+        // 3. Subtext (Instructions)
+        brush.font = "20px Arial";
+        brush.fillStyle = "white";
+        // Shifted down slightly to avoid overlapping the main title
+        brush.fillText("Press F5 to Restart the Mission", canvas.width / 2, canvas.height / 2 + 60);
+        gameover = false; // Reset gameover to prevent repeated calls
+    }
+}
 const colliion = (rocketX, rocketY, meteorX, meteorY) => {
     let distance = Math.sqrt((rocketX - meteorX) ** 2 + (rocketY - meteorY) ** 2);
-    if (distance < 50 && gameOver === false) {
-        gameOver = true;
-        alert("Collision Detected!");
+    if (distance < 60 && gameover === false) {
+        gameover = true;
+        gameoverdis(true);
+        setTimeout(() => {
+            location.reload(); 
+        }, 5000);
     }
+    
 };
 // 🌕 Moon
 const drawMoon = (x, y) => {
@@ -72,7 +98,7 @@ const creators = (x, y, radius) => {
 const meteorball = (x, y) => {
     const radius = 40; 
     // Use Math.floor to ensure 'segments' is a whole number for the loop
-    const segments = 10; 
+    const segments = 7; 
     const steps = (2 * Math.PI) / segments;
 
     brush.beginPath(); 
@@ -157,14 +183,11 @@ window.addEventListener("keyup", (event) => {
 });
 // 🌊 Main Animation Loop
 const animate = () => {
-
-    // video background
-    if (video.readyState >= 2) {
-        brush.drawImage(video, 0, 0, canvas.width, canvas.height);
-    } else {
-        brush.clearRect(0, 0, canvas.width, canvas.height);
+    brush.clearRect(0, 0, canvas.width, canvas.height);
+    if (gameover === true) {
+        gameoverdis(gameover);
+        return; 
     }
-
     // grow wave amplitude
     if (amplitude <= AMPLITUDE_LIMIT) {
         amplitude += 0.2;
@@ -217,6 +240,8 @@ const animate = () => {
     // ✅ check both meteors
     colliion(ballX, rawBallY, meteorX1, meteorY1);
     colliion(ballX, rawBallY, meteorX2, meteorY2);
+
+    
 
     time += speed;
     requestAnimationFrame(animate);
