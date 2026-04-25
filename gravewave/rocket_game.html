@@ -1,4 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STELLAR DRIFT</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
+  body {
+    background: #000;
+    overflow: hidden;
+    font-family: 'Orbitron', sans-serif;
+    cursor: none;
+  }
+
+  #gameWrapper {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  #starfield {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  #canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  /* HUD Overlay */
+  #hud {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Score */
+  #scoreDisplay {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  #scoreLabel {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: rgba(0,255,200,0.5);
+    text-transform: uppercase;
+  }
+  #scoreValue {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: #00ffc8;
+    text-shadow: 0 0 20px rgba(0,255,200,0.6), 0 0 40px rgba(0,255,200,0.3);
+    letter-spacing: 2px;
+  }
+
+  /* Speed indicator */
+  #speedBar {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  #speedLabel {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: rgba(255,100,50,0.5);
+  }
+  #speedTrack {
+    width: 120px;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  #speedFill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff6432, #ff2255);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 8px rgba(255,100,50,0.8);
+  }
+
+  /* Control hint */
+  #hint {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.25);
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  /* Corner decorations */
+  .corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    opacity: 0.3;
+  }
+  .corner-tl { top: 12px; left: 12px; border-top: 1px solid #00ffc8; border-left: 1px solid #00ffc8; }
+  .corner-tr { top: 12px; right: 12px; border-top: 1px solid #00ffc8; border-right: 1px solid #00ffc8; }
+  .corner-bl { bottom: 12px; left: 12px; border-bottom: 1px solid #00ffc8; border-left: 1px solid #00ffc8; }
+  .corner-br { bottom: 12px; right: 12px; border-bottom: 1px solid #00ffc8; border-right: 1px solid #00ffc8; }
+
+  /* Scanline effect */
+  #scanlines {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+  }
+
+  /* Vignette */
+  #vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+  }
+</style>
+</head>
+<body>
+<div id="gameWrapper">
+  <!-- Starfield layer -->
+  <canvas id="starfield"></canvas>
+
+  <!-- Game canvas -->
+  <canvas id="canvas"></canvas>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+
+    <div id="scoreDisplay">
+      <div id="scoreLabel">SCORE</div>
+      <div id="scoreValue">0000</div>
+    </div>
+
+    <div id="speedBar">
+      <div id="speedLabel">THREAT LEVEL</div>
+      <div id="speedTrack"><div id="speedFill"></div></div>
+    </div>
+
+    <div id="hint">[ SPACE ] — TOGGLE THRUST</div>
+  </div>
+
+  <!-- Visual effects -->
+  <div id="scanlines"></div>
+  <div id="vignette"></div>
+</div>
+
+<script>
 // ── Canvas setup ──────────────────────────────────────────────────────────────
 const canvas = document.getElementById("canvas");
 const brush = canvas.getContext("2d");
@@ -418,3 +605,6 @@ function animate() {
 }
 
 animate();
+</script>
+</body>
+</html>
